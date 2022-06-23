@@ -1,0 +1,7 @@
+main.ihex
+main.out
+lib/adc.o
+lib/gpio_pin.o
+lib/libste.a
+lib/timer.o
+lib/uart.o
