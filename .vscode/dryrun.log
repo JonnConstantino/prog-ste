@@ -1,0 +1,8 @@
+make --dry-run --always-make --keep-going --print-directory
+make: Entering directory '/home/jhonatan/Documents/ste/prog-ste'
+(cd lib && make all)
+avr-g++ -mmcu=atmega328p  -Os -Wl,-u,vfprintf -lprintf_flt loop_main.cpp lib/libste.a -o main.out
+avr-objcopy -O ihex main.out main.ihex
+avrdude -p atmega328p -c arduino -P /dev/ttyACM0 -U flash:w:main.ihex
+make: Leaving directory '/home/jhonatan/Documents/ste/prog-ste'
+ 
