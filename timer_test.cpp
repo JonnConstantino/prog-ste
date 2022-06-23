@@ -28,7 +28,7 @@ void setup()
 void delay1(void)
 {
     Microseconds d = 1000000;
-    Microseconds end = timer.micros() + d;
+    Microseconds end = timer.micros() + d*60;
 
 
  // volatile unsigned long x = 0x7ffff;
