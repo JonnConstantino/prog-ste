@@ -3,53 +3,15 @@
  * POT - ADC0
  */
 
-/*
- * Arquivo: uart_loopback.cpp
- * Autor: Arliones Hoeller
- * Organização: IFSC-SJE
- */
-
-// #include <stdio.h>
-// #include "lib/uart.h"
-// #include <avr/interrupt.h>
-
-// Uart uart(57600);
-
-// void setup()
-// {
-//     sei();
-//     uart.puts("Setup\n");
-// }
-
-// void loop()
-// {
-//     uart.put(uart.get());
-// }
-
-// int main() {
-//     setup();
-//     while(true)
-//     {
-//         loop();
-//     }
-// }
-
-
-
-
-/*
- * Arquivo: adc.h
- * Autor: Arliones Hoeller
- * Organização: IFSC-SJE
- */
-
 #include <stdio.h>
 #include "lib/uart.h"
 #include "lib/adc.h"
+#include "lib/timer.h"
 #include <avr/interrupt.h> 
 
 AdcChannel adc0(0);
 Uart uart(57600);
+Timer timer;
 
 void setup()
 {
@@ -63,6 +25,20 @@ void delay1000(void)
 {
   volatile unsigned long x = 0x7ffff;
   while(x--);
+}
+
+void delay(int s)
+{
+    Microseconds d = 1000000;
+    Microseconds end = timer.micros() + d*s;
+
+
+ // volatile unsigned long x = 0x7ffff;
+ // while(x--);
+   while (timer.micros() < end)
+   {
+
+   }
 }
 
 float f_volts(unsigned int d)
@@ -88,7 +64,7 @@ void readAdc0()
 void loop()
 {
     readAdc0();
-    delay1000();
+    delay(60);
     uart.put(uart.get());
 }
 
