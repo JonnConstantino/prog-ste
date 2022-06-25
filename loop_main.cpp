@@ -7,7 +7,16 @@
 #include "lib/uart.h"
 #include "lib/adc.h"
 #include "lib/timer.h"
-#include <avr/interrupt.h> 
+#include "lib/cfifo.h"
+#include <avr/interrupt.h>
+
+#define CMAX 8
+
+typedef void (*FuncPtr)(void);
+typedef CircularFifo<CMAX, FuncPtr> cFifoDeFuncoes_t;
+cFifoDeFuncoes_t cFifoAdc;
+cFifoDeFuncoes_t cFifoUartTx;
+cFifoDeFuncoes_t cFifoUartRx;
 
 AdcChannel adc0(0);
 Uart uart(57600);
@@ -23,27 +32,32 @@ void setup()
 
 void delay1000(void)
 {
-  volatile unsigned long x = 0x7ffff;
-  while(x--);
+    volatile unsigned long x = 0x7ffff;
+    while (x--)
+        ;
 }
 
-void delay(int s)
+void delay1min(void)
 {
-    Microseconds d = 1000000;
-    Microseconds end = timer.micros() + d*s;
+    Microseconds d = 6000000;
+    Microseconds end = timer.micros() + d;
 
+    while (timer.micros() < end)
+        ;
+}
 
- // volatile unsigned long x = 0x7ffff;
- // while(x--);
-   while (timer.micros() < end)
-   {
+void delay1ms(void)
+{
+    Microseconds d = 1000;
+    Microseconds end = timer.micros() + d;
 
-   }
+    while (timer.micros() < end)
+        ;
 }
 
 float f_volts(unsigned int d)
 {
-    return d * (5.0/1023);
+    return d * (5.0 / 1023);
 }
 
 void readAdc0()
@@ -56,21 +70,50 @@ void readAdc0()
     char buffer[32];
     sprintf(buffer, "Digital %d\n", media);
     uart.puts(buffer);
-    
+
     sprintf(buffer, "Milivolts %f\n", f_volts(media));
     uart.puts(buffer);
 }
 
+// void putFifo()
+// {
+//     cFifoAdc.enqueue(readAdc0);
+//     cFifoAdc.enqueue(delay1min);
+//     cFifoAdc.enqueue(readAdc0);
+//     cFifoAdc.enqueue(delay1min);
+//     cFifoAdc.enqueue(readAdc0);
+//     cFifoAdc.enqueue(delay1min);
+//     cFifoAdc.enqueue(readAdc0);
+//     cFifoAdc.enqueue(delay1min);
+// }
+
+// void loop()
+// {
+//     putFifo();
+//     static FuncPtr f;
+//     int i = 0;
+//     while (i < CMAX)
+//     {
+//         cli();
+//         f = cFifoAdc.dequeue(i);
+//         sei();
+//         f();
+//         uart.put(uart.get());
+//         i++;
+//     }
+// }
+
 void loop()
 {
     readAdc0();
-    delay(60);
+    delay1min();
     uart.put(uart.get());
 }
 
-int main() {
+int main()
+{
     setup();
-    while(true)
+    while (true)
     {
         loop();
     }
